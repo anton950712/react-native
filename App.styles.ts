@@ -3,6 +3,10 @@ import { StyleSheet } from "react-native";
 import { colors } from "./src/Constants";
 
 export const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    marginBottom: 20
+  },
   header: {
     backgroundColor: colors.blue500,
     padding: 16,
@@ -29,6 +33,6 @@ export const styles = StyleSheet.create({
     paddingVertical: 5
   },
   content: {
-    padding: 20
+    paddingHorizontal: 15
   }
 });

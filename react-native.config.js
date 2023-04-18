@@ -1,7 +1,7 @@
 module.exports = {
   project: {
     ios: {
-      sourceDir: './custom-ios-location',
+      sourceDir: "./custom-ios-location",
     },
   },
 };

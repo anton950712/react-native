@@ -1,118 +1,74 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, { useCallback, useEffect, useState } from "react";
+import { FlatList, RefreshControl, SafeAreaView, StatusBar, Text, TextInput, View } from "react-native";
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import { Product } from "Types/products.interface";
+import { ProductCard } from "Elements/ProductCard";
+import { ProductView } from "Elements/ProductView";
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import { styles } from "./App.styles";
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+function App() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
-function Section({ children, title }: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+  const getData = async (callback?: () => void) => {
+    const response = await fetch("https://demo.spreecommerce.org/api/v2/storefront/products");
+    const jsonData = await response.json();
 
-function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+    const productsData = jsonData.data;
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+    if (productsData) {
+      setProducts(productsData);
+    }
+
+    callback?.();
+  }
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    getData(() => setRefreshing(false))
+  }, []);
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar animated />
+      <View style={styles.header}>
+        <Text style={styles.headerText}>Ecommerce Store</Text>
+      </View>
+      { true && (
+        <>
+          <View style={styles.search}>
+            <TextInput
+              style={styles.searchField}
+              placeholder="Search..."
+            />
+          </View>
+          <FlatList
+            style={styles.content}
+            numColumns={2}
+            data={products}
+            keyExtractor={item => item.id }
+            renderItem={({ item }) => (
+              <ProductCard {...item} />
+            )}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+              />
+            }
+          />
+        </>
+      ) }
+      { false && !!products.length && (
+        <ProductView {...products[0]} />
+      ) }
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;

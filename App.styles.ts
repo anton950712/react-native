@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-import { colors } from "./src/Constants";
+import { colors } from "Constants";
 
 export const styles = StyleSheet.create({
   safeArea: {
@@ -21,18 +21,5 @@ export const styles = StyleSheet.create({
     textAlign: "center",
     letterSpacing: 0.15,
     color: colors.white
-  },
-  search: {
-    padding: 20
-  },
-  searchField: {
-    borderRadius: 4,
-    borderColor: colors.gray100,
-    borderWidth: 1,
-    paddingHorizontal: 15,
-    paddingVertical: 5
-  },
-  content: {
-    paddingHorizontal: 15
   }
 });
